@@ -1,8 +1,9 @@
-// SPI write speed benchmark, example for vector gaming via MCP4922
+// SPI write speed benchmark, example for vector gaming via MCP4922 ADC
 // Video: https://www.youtube.com/watch?v=hxSL9cxeJXo
 // by Martin Strohmayer
 // Licence: CC BY 4.0
-// Compile: gcc spi_bench_adc.c -o spi_bench_adc -Wall -lwiringPi -lm
+// Info: It's not needed to connect hardware - it's only a write benchmark
+// Compile: gcc spi_bench_dac.c -o spi_bench_dac -Wall -lwiringPi -lm
 
 #include <stdio.h>
 #include <stdlib.h>
