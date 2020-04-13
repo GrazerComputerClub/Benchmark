@@ -13,7 +13,7 @@
   - BananaPi M2 Zero v1.0, 1008 MHz: 34.721 us
   
   
-## SPI ADC/VectorGaming (WiringPi GPIO, SPI via /dev/spidev0.0, 6 MHz) - Pong
+## SPI DAC/VectorGaming (WiringPi GPIO, SPI via /dev/spidev0.0, 6 MHz) - Pong
 * Raspjamming 20.04, WiringPi 2.60.200410:
   - BananaPi M2 Zero v1.0, 1008 MHz: 65 us
 * Raspjamming 20.04, WiringPi 2.52:
