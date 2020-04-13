@@ -28,3 +28,8 @@
 * Raspjamming 20.02, WiringPi 2.52:
   - Raspberry Pi Zero v1.3, 1000 MHz: 91 us
   - Raspberry Pi Zero v1.3, 1150 MHz: 77 us
+
+### I2C MCP23017 GBA dumper (WiringPi GPIO, I2C-1 via /dev/i2c-1, 400 kHz) - GB Testris (32 KiB) 
+* Raspjamming 20.02, WiringPi 2.52:
+  - Raspberry Pi Zero v1.3, 1000 MHz: 795 us
+  - Raspberry Pi Zero v1.3, 1150 MHz: 788 us
