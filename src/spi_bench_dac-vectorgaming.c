@@ -1,9 +1,9 @@
-// SPI write speed benchmark, example for vector gaming via MCP4922 ADC
+// SPI/GPIO write speed benchmark, example for vector gaming via MCP4922 ADC
 // Video: https://www.youtube.com/watch?v=hxSL9cxeJXo
 // by Martin Strohmayer
 // Licence: CC BY 4.0
-// Info: It's not needed to connect hardware - it's only a write benchmark
-// Compile: gcc spi_bench_dac.c -o spi_bench_dac -Wall -lwiringPi -lm
+// Info: It's not needed to connect hardware - it's a write benchmark
+// Compile: gcc spi_bench_dac-vectorgaming.c -o spi_bench_dac-vectorgaming -Wall -lwiringPi -lm
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -160,7 +160,7 @@ int main (void) {
 	const int SPIDeviceNo = 0;
 	const char SPIDevice[] = "/dev/spidev0.0";
 
-	printf("WiringPi SPI speed test program \n");
+	printf("WiringPi SPI speed (vector gaming) test program\n");
 	
 	if (wiringPiSPISetup(SPIDeviceNo, SPIFreqMHz * 1000000) == -1) {
 		printf("wiringPiSPISetup failed\n\n");
