@@ -2,7 +2,7 @@
 //
 // by GC2 - mstroh
 // Licence: CC BY 4.0
-// Compile: gcc gpio_bench.c -o gpio_bench -Wall -lwiringPi
+// Compile: gcc gpio_wiringpi.c -o gpio_wiringpi -Wall -lwiringPi
 
 #include <wiringPi.h>
 #include <stdio.h>
