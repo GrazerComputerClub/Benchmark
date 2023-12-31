@@ -1,4 +1,4 @@
-// GPIO write speed benchmark, example for generating clock
+// GPIO write speed benchmark
 //
 // by GC2 - mstroh
 // Licence: CC BY 4.0
@@ -13,7 +13,7 @@
 #include <sys/time.h>
 
 
-const int GPIO = 18; // default PWM output 
+const int GPIO = 24;
 
 
 int main (void){
@@ -21,7 +21,7 @@ int main (void){
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
-	printf("WiringPi GPIO speed test program \n");
+	printf("WiringPi GPIO speed test program  (using GPIO %d)\n", GPIO);
 
 	if (wiringPiSetupGpio() == -1){
 		printf("wiringPiSetup failed\n\n");
@@ -32,7 +32,7 @@ int main (void){
 
 	delay(500);
 
-	printf("toggle %d million times ...\n", ToggleValue/1000000);
+	printf("toggle % 3d million times ...\n", ToggleValue/1000000);
 	gettimeofday(&t1, NULL);
 	for (int loop=1; loop<ToggleValue; loop++) {
 		digitalWrite(GPIO, LOW);
@@ -42,7 +42,7 @@ int main (void){
 	elapsedTime = (t2.tv_sec-t1.tv_sec)+(t2.tv_usec-t1.tv_usec)/1000000.0;
 	fTimePerOperation = elapsedTime*1000000.0/ToggleValue;
 	fFreq = ToggleValue/elapsedTime/1000000.0;
-	printf("  %d toggle took %.3f s, Time per toggle %.3f us, Freq %.3f MHz \n",
+	printf("  % 9d toggle took %.3f s, Time per toggle %.3f us, Freq %.3f MHz \n",
 	  ToggleValue, elapsedTime, fTimePerOperation, fFreq);
 
 	digitalWrite(GPIO, LOW);
