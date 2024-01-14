@@ -24,7 +24,7 @@ int main (void){
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
-	printf("pigpio GPIO speed test program  (using GPIO %d)\n", GPIO);
+	printf("pigpio GPIO speed test program (using GPIO %d)\n", GPIO);
 
 	if (gpioInitialise() == PI_INIT_FAILED) {
       printf("ERROR: Failed to initialize the GPIO interface.\n");

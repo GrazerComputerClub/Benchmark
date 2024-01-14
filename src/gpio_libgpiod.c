@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
-	printf("gpiod GPIO speed test program (using pin %d)\n", line_num);
+	printf("gpiod GPIO speed test program (using line %d)\n", line_num);
 
 	chip = gpiod_chip_open_by_name(chipname);
 	if (!chip) {

@@ -22,7 +22,7 @@ int main (void){
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
-	printf("WiringPi GPIO speed test program  (using GPIO %d)\n", GPIO);
+	printf("WiringPi GPIO speed test program (using GPIO %d)\n", GPIO);
 
 	if (wiringPiSetupGpio() == -1){
 		printf("wiringPiSetup failed\n\n");
