@@ -2,6 +2,7 @@
 //
 // by GC2 - mstroh
 // Licence: CC BY 4.0
+// Install: see 
 // Compile: gcc gpio_wiringpi.c -o gpio_wiringpi -Wall -lwiringPi
 
 #include <wiringPi.h>
@@ -29,8 +30,6 @@ int main (void){
 	}
 
 	pinMode(GPIO, OUTPUT);
-
-	delay(500);
 
 	printf("toggle % 3d million times ...\n", ToggleValue/1000000);
 	gettimeofday(&t1, NULL);

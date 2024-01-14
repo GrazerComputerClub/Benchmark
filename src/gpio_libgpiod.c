@@ -8,7 +8,7 @@
 #include <gpiod.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <stdlib.h>
+#include <stdlib.h>y^
 #include <signal.h>
 #include <string.h>
 #include <time.h>

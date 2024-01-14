@@ -2,7 +2,10 @@
 //
 // by GC2 - mstroh
 // Licence: CC BY 4.0
+// Install: sudo apt install pigpio libpigpio-dev 
 // Compile: gcc gpio_pigpio.c -o gpio_pigpio -lpigpio -Wall
+// Execute: sudo ./gpio_pigpio 
+
 
 #include <pigpio.h>
 #include <stdio.h>
@@ -30,8 +33,6 @@ int main (void){
 
 	gpioSetMode(GPIO, PI_OUTPUT);
 
-	delay(500);
-
 	printf("toggle % 3d million times ...\n", ToggleValue/1000000);
 	gettimeofday(&t1, NULL);
 	for (int loop=1; loop<ToggleValue; loop++) {
@@ -43,7 +44,7 @@ int main (void){
 	elapsedTime = (t2.tv_sec-t1.tv_sec)+(t2.tv_usec-t1.tv_usec)/1000000.0;
 	fTimePerOperation = elapsedTime*1000000.0/ToggleValue;
 	fFreq = ToggleValue/elapsedTime/1000000.0;
-	printf("pigpio  % 9d toggle took %.3f s, Time per toggle %.3f us, Freq %.3f MHz \n",
+	printf("  % 9d toggle took %.3f s, Time per toggle %.3f us, Freq %.3f MHz \n",
 	  ToggleValue, elapsedTime, fTimePerOperation, fFreq);
 
   	gpioSetMode(GPIO, PI_INPUT);
