@@ -12,7 +12,7 @@ import time
 from signal import pause
 
 SigOUT = 24
-LOOPS = 1000000
+LOOPS = 3000000
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
