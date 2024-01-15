@@ -8,19 +8,34 @@
 #include <gpiod.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <stdlib.h>y^
+#include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
 
-#ifndef	CONSUMER
-#define	CONSUMER	"Consumer"
-#endif
+const int Pi5_ModelNo = 23;
+
+int detect_pi_modelno() {
+   unsigned char revision[4];
+
+  FILE* fp = fopen("/proc/device-tree/system/linux,revision","rb");
+  if (fp && fread(revision,4,1,fp)>0) {
+      fclose(fp);
+      //printf("revision: %02x %02x %02x %02x\n", revision[0], revision[1], revision[2], revision[3]);
+      unsigned char byte0 = revision[3] >> 4;
+      unsigned char byte1 = revision[2] & 0x0F;
+      return byte1*16+byte0;
+  }
+
+  return 0;
+}
+
 
 int main(int argc, char **argv)
 {
-	char *chipname = "gpiochip0";
+	char *chipname    = "gpiochip0";
+	char *chipnamePi5 = "gpiochip4";
 	unsigned int line_num = 24;	// GPIO Pin #24
 	struct gpiod_chip *chip;
 	struct gpiod_line *line;
@@ -29,9 +44,23 @@ int main(int argc, char **argv)
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
+	int model= detect_pi_modelno();
+	if (model==Pi5_ModelNo) { //Raspberry Pi 5
+		printf("found model: %d, Raspberry Pi 5\n", model);
+	} else if(model>0) {
+		printf("found model: %d\n", model);
+	} else {
+		printf("found unknown model, exiting\n");
+		return EXIT_FAILURE;
+	}
+
 	printf("gpiod GPIO speed test program (using line %d)\n", line_num);
 
-	chip = gpiod_chip_open_by_name(chipname);
+	if (model>=Pi5_ModelNo) { //Raspberry Pi 5
+		chip = gpiod_chip_open_by_name(chipnamePi5);
+	} else {
+		chip = gpiod_chip_open_by_name(chipname);
+	}
 	if (!chip) {
 		perror("Open chip failed\n");
 		goto end;
@@ -43,7 +72,7 @@ int main(int argc, char **argv)
 		goto close_chip;
 	}
 
-	ret = gpiod_line_request_output(line, CONSUMER, 0);
+	ret = gpiod_line_request_output(line, "gpio_bench", 0);
 	if (ret < 0) {
 		perror("Request line as output failed\n");
 		goto release_line;
@@ -68,5 +97,5 @@ release_line:
 close_chip:
 	gpiod_chip_close(chip);
 end:
-	return 0;
+	return EXIT_SUCCESS;
 }
