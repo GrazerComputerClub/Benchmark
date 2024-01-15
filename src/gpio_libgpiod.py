@@ -29,7 +29,7 @@ line = chip.get_line(SigOUT);
 
 line.request(consumer="gpio_bench", type=gpiod.LINE_REQ_DIR_OUT, default_val=0)
 
-print("gpiod toggle {0} times at {1}\n".format( LOOPS, lines ))
+print("gpiod toggle {0} times at {1} (single line function)\n".format( LOOPS, line ))
 
 t0 = time.time()
 

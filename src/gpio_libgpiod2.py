@@ -19,7 +19,7 @@ def detect_pi_modelno() -> int:
   return int(byte1*16+byte0)
 
 SigOUT = "GPIO24"
-LOOPS = 300000
+LOOPS = 900000
 
 if detect_pi_modelno()==23 :   # Raspberry Pi 5
     chip=gpiod.Chip('gpiochip4')
@@ -29,7 +29,7 @@ line = gpiod.find_line(SigOUT)
 lines = chip.get_lines([line.offset()])
 lines.request(consumer='gpio_bench', type=gpiod.LINE_REQ_DIR_OUT, default_vals=[0])
 
-print("gpiod toggle {0} times at {1}\n".format( LOOPS, lines ))
+print("gpiod toggle {0} times at {1} (multi line function)\n".format( LOOPS, lines ))
 
 t0 = time.time()
 
