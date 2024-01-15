@@ -11,21 +11,30 @@ import gpiod
 import time
 from signal import pause
 
-SigOUT = "GPIO24"
+def detect_pi_modelno() -> int:
+  with open('/proc/device-tree/system/linux,revision', mode="rb") as f:
+    revision = f.read(4)
+  byte0 = revision[3] >> 4 
+  byte1 = revision[2] & 0x0F
+  return int(byte1*16+byte0)
+
+SigOUT = "24"
 LOOPS = 1000000
 
-chip=gpiod.Chip('gpiochip0')
-line = gpiod.find_line("GPIO24")
-lines = chip.get_lines([line.offset()])
-lines.request(consumer='gpio_bench', type=gpiod.LINE_REQ_DIR_OUT, default_vals=[0])
+if detect_pi_modelno()==23 :   # Raspberry Pi 5
+    chip=gpiod.Chip('gpiochip4')
+else
+    chip=gpiod.Chip('gpiochip0')
+line = chip.get_line(SigOUTNo);
+line.request(consumer="gpio_bench", type=gpiod.LINE_REQ_DIR_OUT, default_val=0)
 
-print("libgpio toggle {0} times at {1}\n".format( LOOPS, lines ))
+print("libgpio toggle {0} times at {1}\n".format( LOOPS, line ))
 
 t0 = time.time()
 
 for i in range(LOOPS):
-    lines.set_values([0])
-    lines.set_values([1])
+    line.set_value(0)
+    line.set_value(1)
 
 t1 = time.time()
 
