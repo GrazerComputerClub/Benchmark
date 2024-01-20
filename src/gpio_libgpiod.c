@@ -2,7 +2,7 @@
 //
 // by GC2 - mstroh
 // Licence: CC BY 4.0
-// Install: sudo apt install libgpiod libgpiod-dev 
+// Install: sudo apt install libgpiod2 libgpiod-dev 
 // Compile: gcc gpio_libgpiod.c -o gpio_gpiod -Wall -lgpiod
 
 #include <gpiod.h>
@@ -62,7 +62,7 @@ uint32_t GetPiRevision() {
 	}
 	revision = bswap_32(revision);
 	//printf("revision: %x\n", revision); 
-	return bswap_32(revision);
+	return revision;
 }
 
 
@@ -77,8 +77,6 @@ int main(int argc, char **argv) {
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
-	//unsigned int rev = GetRevision();
-	//printf("Revision: 0x%x\n", rev);
 	int model = detect_pi_modelno();
 	if (model==Pi5_ModelNo) { //Raspberry Pi 5
 		printf("found model: %d, Raspberry Pi 5\n", model);
