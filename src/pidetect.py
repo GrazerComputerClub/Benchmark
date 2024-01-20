@@ -44,7 +44,7 @@ model = detect_model()
 revision = detect_revision()
 if int(revision,16)<0x800000 :
     print("model: {0}".format( model ))
-    print("old revision format, modelno detection not supported\n")
+    print("old revision code, modelno detection not supported\n")
     quit()
 modelno = detect_modelno()
 RAMSizeID = detect_RAMSize()
