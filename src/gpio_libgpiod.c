@@ -13,27 +13,60 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <stdint.h>
+#include <byteswap.h>
+
 
 const int Pi5_ModelNo = 23;
+const char* revfile = "/proc/device-tree/system/linux,revision";
 
 int detect_pi_modelno() {
-   unsigned char revision[4];
+	unsigned char revision[4]={0,0,0,0};
 
-  FILE* fp = fopen("/proc/device-tree/system/linux,revision","rb");
-  if (fp && fread(revision,4,1,fp)>0) {
-      fclose(fp);
-      //printf("revision: %02x %02x %02x %02x\n", revision[0], revision[1], revision[2], revision[3]);
-      unsigned char byte0 = revision[3] >> 4;
-      unsigned char byte1 = revision[2] & 0x0F;
-      return byte1*16+byte0;
-  }
-
-  return 0;
+	FILE* fp = fopen(revfile,"rb");
+	if (!fp) {
+		perror(revfile);
+		return -1; // revision file not found or no access
+	}
+	int result = fread(revision,4,1,fp);
+	fclose(fp);
+	if (result<1) {
+		perror(revfile);
+		return -2; // read error
+	}
+	//printf("revision: %02x %02x %02x %02x\n", revision[0], revision[1], revision[2], revision[3]);
+	unsigned char byte0 = revision[3] >> 4;
+	unsigned char byte1 = revision[2] & 0x0F;
+	unsigned char nflag = revision[1] & 0x80;
+	if (nflag>0) {
+		return byte1*16+byte0; // model found
+	}
+	return 0; // unknown model
 }
 
 
-int main(int argc, char **argv)
-{
+uint32_t GetPiRevision() {
+	uint32_t revision;
+	_Static_assert(sizeof(revision)==4, "should be unsigend integer with 4 byte size");
+
+	FILE* fp = fopen(revfile,"rb");
+	if (!fp) {
+		perror(revfile);
+		return 0; // revision file not found or no access
+	}
+	int result = fread(&revision,sizeof(revision),1,fp);
+	fclose(fp);
+	if (result<1) {
+		perror(revfile);
+		return 0; // read error
+	}
+	revision = bswap_32(revision);
+	//printf("revision: %x\n", revision); 
+	return bswap_32(revision);
+}
+
+
+int main(int argc, char **argv) {
 	char *chipname    = "gpiochip0";
 	char *chipnamePi5 = "gpiochip4";
 	unsigned int line_num = 24;	// GPIO Pin #24
@@ -44,13 +77,17 @@ int main(int argc, char **argv)
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
-	int model= detect_pi_modelno();
+	//unsigned int rev = GetRevision();
+	//printf("Revision: 0x%x\n", rev);
+	int model = detect_pi_modelno();
 	if (model==Pi5_ModelNo) { //Raspberry Pi 5
 		printf("found model: %d, Raspberry Pi 5\n", model);
 	} else if(model>0) {
 		printf("found model: %d\n", model);
+	} else if(model==0) {
+		printf("unknown model (old style revision code %x)\n", GetPiRevision());
 	} else {
-		printf("found unknown model, exiting\n");
+		printf("could not detect revision, looks like this is not a Raspberry Pi system\n");
 		return EXIT_FAILURE;
 	}
 
