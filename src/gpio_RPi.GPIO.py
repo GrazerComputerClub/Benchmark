@@ -9,10 +9,9 @@ Install: sudo apt install python3-rpi.gpio
 
 import RPi.GPIO as GPIO
 import time
-from signal import pause
 
 SigOUT = 24
-LOOPS = 3000000
+LOOPS = 5000000
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)

@@ -12,18 +12,18 @@ import time
 from signal import pause
 
 SigOUT = 24
-LOOPS = 100000
+LOOPS = 200000
 
-gpio24 = LED(24)
-gpio24.off()
+gpio = LED(SigOUT)
+gpio.off()
 
-print("gpiozero toggle {0} times at {1}\n".format( LOOPS, gpio24 ))
+print("gpiozero toggle {0} times at {1}\n".format( LOOPS, gpio ))
 
 t0 = time.time()
 
 for i in range(LOOPS):
-    gpio24.off()
-    gpio24.on()
+    gpio.off()
+    gpio.on()
 
 t1 = time.time()
 
