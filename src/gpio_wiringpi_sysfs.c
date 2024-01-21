@@ -3,7 +3,7 @@
 // by GC2 - mstroh
 // Licence: CC BY 4.0
 // Install: see https://github.com/GrazerComputerClub/WiringPi
-// Compile: gcc gpio_wiringpi.c -o gpio_wiringpi -Wall -lwiringPi
+// Compile: gcc gpio_wiringpi_sysfs.c -o gpio_wiringpi_sysfs -Wall -lwiringPi
 
 #include <wiringPi.h>
 #include <stdio.h>
@@ -15,20 +15,22 @@
 
 
 const int GPIO = 24;
-const int  ToggleValue = 200000000;
+const int  ToggleValue = 2000000;
 
 int main (void){
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
+	char cmd[64];
 
-	printf("WiringPi GPIO speed test program (using GPIO %d)\n", GPIO);
+	printf("WiringPi GPIO speed test program (using GPIO %d via sysfs)\n", GPIO);
+	sprintf(cmd, "/usr/bin/gpio export %d out", GPIO);
+	printf("execute: %s\n", cmd);
+	system(cmd);
 
-	if (wiringPiSetupGpio() == -1){
-		printf("wiringPiSetup failed\n\n");
+	if (wiringPiSetupSys()  == -1){
+		printf("wiringPiSetupSys failed\n\n");
 		exit(EXIT_FAILURE);
 	}
-
-	pinMode(GPIO, OUTPUT);
 
 	printf("toggle % 3d million times ...\n", ToggleValue/1000000);
 	gettimeofday(&t1, NULL);
@@ -44,7 +46,10 @@ int main (void){
 	  ToggleValue, elapsedTime, fTimePerOperation, fFreq);
 
 	digitalWrite(GPIO, LOW);
-	pinMode(GPIO, INPUT);
+	sprintf(cmd, "/usr/bin/gpio export %d in", GPIO);
+	printf("execute: %s\n", cmd);
+	system(cmd);
 
 	return(EXIT_SUCCESS);
 }
+
