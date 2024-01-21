@@ -23,11 +23,11 @@ int main (void){
 	char cmd[64];
 
 	printf("WiringPi GPIO speed test program (using GPIO %d via sysfs)\n", GPIO);
-	sprintf(cmd, "/usr/bin/gpio export %d out", GPIO);
+	sprintf(cmd, "gpio export %d out", GPIO);
 	printf("execute: %s\n", cmd);
 	system(cmd);
 
-	if (wiringPiSetupSys()  == -1){
+	if (wiringPiSetupSys()  == -1) {
 		printf("wiringPiSetupSys failed\n\n");
 		exit(EXIT_FAILURE);
 	}
@@ -46,7 +46,9 @@ int main (void){
 	  ToggleValue, elapsedTime, fTimePerOperation, fFreq);
 
 	digitalWrite(GPIO, LOW);
-	sprintf(cmd, "/usr/bin/gpio export %d in", GPIO);
+	sprintf(cmd, "gpio export %d in", GPIO);
+	printf("execute: %s\n", cmd);
+	sprintf(cmd, "gpio unexport %d", GPIO);
 	printf("execute: %s\n", cmd);
 	system(cmd);
 
