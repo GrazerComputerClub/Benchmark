@@ -17,4 +17,4 @@ pybench:
 pi5bench:
 	./gpio_gpiozero.py && echo  && ./gpio_libgpiod.py && echo  && ./gpio_gpiod
 clean:
-	rm -f gpio_wiringpi gpio_pigpio gpio_gpiod 
+	rm -f gpio_wiringpi gpio_pigpio gpio_gpiod gpio_wiringpi_sysfs
