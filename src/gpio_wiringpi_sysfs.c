@@ -17,15 +17,19 @@
 const int GPIO = 24;
 const int  ToggleValue = 2000000;
 
-int main (void){
+void execute(const char* cmd) {
+	printf("execute: %s\n", cmd);
+	system(cmd);
+}
+
+int main (void) {
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 	char cmd[64];
 
 	printf("WiringPi GPIO speed test program (using GPIO %d via sysfs)\n", GPIO);
 	sprintf(cmd, "gpio export %d out", GPIO);
-	printf("execute: %s\n", cmd);
-	system(cmd);
+	execute(cmd);
 
 	if (wiringPiSetupSys()  == -1) {
 		printf("wiringPiSetupSys failed\n\n");
@@ -44,13 +48,11 @@ int main (void){
 	fFreq = ToggleValue/elapsedTime/1000000.0;
 	printf("  % 9d toggle took %.3f s, Time per toggle %.3f us, Freq %.3f MHz \n",
 	  ToggleValue, elapsedTime, fTimePerOperation, fFreq);
-
 	digitalWrite(GPIO, LOW);
 	sprintf(cmd, "gpio export %d in", GPIO);
-	printf("execute: %s\n", cmd);
+	execute(cmd);
 	sprintf(cmd, "gpio unexport %d", GPIO);
-	printf("execute: %s\n", cmd);
-	system(cmd);
+	execute(cmd);
 
 	return(EXIT_SUCCESS);
 }
