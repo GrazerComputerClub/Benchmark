@@ -11,7 +11,7 @@ wiringpi:
 	${CC} ${CFLAGS} gpio_wiringpi.c -o gpio_wiringpi -Wall -lwiringPi
 	${CC} ${CFLAGS} gpio_wiringpi_sysfs.c -o gpio_wiringpi_sysfs -Wall -lwiringPi
 lgpio:
-	${CC} ${CFLAGS} gpio_lgpio.c -o gpio_lgpio -Wall -llgpio
+	${CC} ${CFLAGS} gpio_lgpio.c pimodel.c -o gpio_lgpio -Wall -llgpio
 bench:
 	./gpio_gpiod  && echo  && sudo ./gpio_pigpio && echo  && ./gpio_wiringpi && echo  && ./gpio_wiringpi_sysfs
 pybench:

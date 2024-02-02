@@ -17,23 +17,41 @@
 
 
 const int GPIO = 24;
-const int GPIOChip = 0
+const int GPIOChip = 0;
 
 
-int main (void){
-	const int  ToggleValue = 10000000;
+int main (void) {
+	const int  ToggleValue = 5000000;
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
 	printf("lgpio GPIO speed test program (using GPIO %d)\n", GPIO);
 
-	int chip = lgGpiochipOpen(0);
-	if(chip<=0) {
+	int model = GetRPiModel();
+	if (model==Pi5_ModelNo) { //Raspberry Pi 5
+			printf("found model: %d, Raspberry Pi 5\n", model);
+	} else if(model>0) {
+			printf("found model: %d\n", model);
+	} else if(model==0) {
+			printf("unknown model (old style revision code %x)\n", GetRPiRevision());
+	} else {
+			printf("could not detect revision, looks like this is not a Raspberry Pi system\n");
+			return EXIT_FAILURE;
+	}
+
+	int chip = -1;
+	if (model>=Pi5_ModelNo) { //Raspberry Pi 5
+			chip = lgGpiochipOpen(4);
+	} else {
+			chip = lgGpiochipOpen(0);
+	}
+
+	if (chip<0) {
 		printf("ERROR: Failed to get GPIO chip %d.\n", GPIOChip);
 		return 1;
 	}
 	int lFlags = 0;
-	int initLevel = 0
+	int initLevel = 0;
 	if (lgGpioClaimOutput(chip, lFlags, GPIO, initLevel) != LG_OKAY) {
 		printf("ERROR: Failed to get GPIO %d for output.\n", GPIO);
 		lgGpiochipClose(chip);
