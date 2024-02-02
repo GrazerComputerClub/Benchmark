@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall 
 
-all: gpiod pigpio wiringpi  
+all: gpiod pigpio wiringpi lgpio 
 
 gpiod: 
 	${CC} ${CFLAGS} gpio_libgpiod.c pimodel.c -o gpio_gpiod -Wall -lgpiod
