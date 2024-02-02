@@ -20,7 +20,7 @@ const int GPIO = 24;
 
 
 int main (void){
-	const int  ToggleValue = 100000000;
+	const int  ToggleValue = 80000000;
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 

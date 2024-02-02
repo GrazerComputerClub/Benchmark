@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 	struct gpiod_chip *chip;
 	struct gpiod_line *line;
 	int ret;
-	const int  ToggleValue = 5000000;
+	const int  ToggleValue = 8000000;
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
