@@ -4,7 +4,7 @@ CFLAGS = -Wall
 all: gpiod pigpio wiringpi  
 
 gpiod: 
-	${CC} ${CFLAGS} gpio_libgpiod.c -o gpio_gpiod -Wall -lgpiod
+	${CC} ${CFLAGS} gpio_libgpiod.c pimodel.c -o gpio_gpiod -Wall -lgpiod
 pigpio:
 	${CC} ${CFLAGS} gpio_pigpio.c -o gpio_pigpio -lpigpio -Wall
 wiringpi:
