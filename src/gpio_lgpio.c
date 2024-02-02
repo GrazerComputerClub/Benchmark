@@ -14,6 +14,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include "pimodel.h"
 
 
 const int GPIO = 24;
