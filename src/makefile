@@ -13,7 +13,7 @@ wiringpi:
 lgpio:
 	${CC} ${CFLAGS} gpio_lgpio.c pimodel.c -o gpio_lgpio -Wall -llgpio
 bench:
-	./gpio_gpiod  && echo  && sudo ./gpio_pigpio && echo  && ./gpio_wiringpi && echo  && ./gpio_wiringpi_sysfs
+	./gpio_gpiod && echo  && ./gpio_lgpio && echo  && sudo ./gpio_pigpio && echo  && ./gpio_wiringpi && echo  && ./gpio_wiringpi_sysfs
 pybench:
 	./gpio_gpiozero.py && echo  && ./gpio_libgpiod.py && echo  && ./gpio_libgpiod2.py && echo  && ./gpio_RPi.GPIO.py 
 pi5bench:
