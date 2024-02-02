@@ -12,7 +12,7 @@ import time
 from signal import pause
 
 SigOUT = 24
-LOOPS = 200000
+LOOPS = 105000
 
 gpio = LED(SigOUT)
 gpio.off()

@@ -19,7 +19,7 @@ def detect_pi_modelno() -> int:
   return int(byte1*16+byte0)
 
 SigOUT = "GPIO24"
-LOOPS = 900000
+LOOPS = 1050000
 
 if detect_pi_modelno()==23 :   # Raspberry Pi 5
     chip=gpiod.Chip('gpiochip4')
