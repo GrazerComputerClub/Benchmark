@@ -15,6 +15,8 @@ bench:
 pybench:
 	./gpio_gpiozero.py && echo  && ./gpio_libgpiod.py && echo  && ./gpio_libgpiod2.py && echo  && ./gpio_RPi.GPIO.py 
 pi5bench:
-	./gpio_gpiozero.py && echo  && ./gpio_libgpiod.py && echo  && ./gpio_gpiod
+	./gpio_gpiozero.py && echo  && ./gpio_libgpiod.py && echo  && ./gpio_gpiod && ./gpio_wiringpi_sysfs
+install:
+	sudo apt install python3-gpiozero python3-rpi.gpio python3-libgpiod python3-lgpio libgpiod2 libgpiod-dev pigpio libpigpio-dev liblgpio1 liblgpio-dev 
 clean:
 	rm -f gpio_wiringpi gpio_pigpio gpio_gpiod gpio_wiringpi_sysfs
