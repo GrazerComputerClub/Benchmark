@@ -15,7 +15,7 @@
 
 
 const int GPIO = 24;
-const int  ToggleValue = 6800000;
+const int  ToggleValue = 6700000;
 
 void execute(const char* cmd) {
 	printf("execute: %s\n", cmd);

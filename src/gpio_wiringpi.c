@@ -15,7 +15,7 @@
 
 
 const int GPIO = 24;
-const int  ToggleValue = 250000000;
+const int  ToggleValue = 240000000;
 
 int main (void){
 	struct timeval t1, t2;
