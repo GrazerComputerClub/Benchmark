@@ -11,7 +11,7 @@ import RPi.GPIO as GPIO
 import time
 
 SigOUT = 24
-LOOPS = 4000000
+LOOPS = 3900000
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
