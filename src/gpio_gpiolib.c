@@ -16,7 +16,7 @@
 #include "pimodel.h"
 #include "gpiolib/gpiolib.h"
 
-unsigned int line_num = 8;	// Pin #24, GPIO #8
+unsigned int line_num = 24;	// GPIO #24
 const int  ToggleValue = 240000000;
 
 int main(int argc, char **argv) {
