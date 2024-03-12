@@ -1,9 +1,11 @@
 CC = gcc
 CFLAGS = -Wall 
 
-all: gpiod pigpio wiringpi lgpio 
+all: gpiod pigpio wiringpi lgpio gpiolib
 
-gpiod: 
+gpiolib:
+	${CC} ${CFLAGS} gpio_gpiolib.c pimodel.c gpiolib/gpiolib.c gpiolib/gpiochip_bcm2712.c gpiolib/gpiochip_bcm2835.c gpiolib/gpiochip_rp1.c gpiolib/util.c -o gpio_gpiolib
+gpiod:
 	${CC} ${CFLAGS} gpio_libgpiod.c pimodel.c -o gpio_gpiod -Wall -lgpiod
 pigpio:
 	${CC} ${CFLAGS} gpio_pigpio.c -o gpio_pigpio -lpigpio -Wall
@@ -21,4 +23,4 @@ pi5bench:
 install:
 	sudo apt install python3-gpiozero python3-rpi.gpio python3-libgpiod python3-lgpio libgpiod2 libgpiod-dev pigpio libpigpio-dev liblgpio1 liblgpio-dev 
 clean:
-	rm -f gpio_wiringpi gpio_pigpio gpio_gpiod gpio_wiringpi_sysfs
+	rm -f gpio_wiringpi gpio_pigpio gpio_gpiod gpio_wiringpi_sysfs gpio_gpiolib
