@@ -16,27 +16,16 @@
 #include "pimodel.h"
 #include "gpiolib/gpiolib.h"
 
+unsigned int line_num = 8;	// Pin #24, GPIO #8
+const int  ToggleValue = 240000000;
+
 int main(int argc, char **argv) {
-	unsigned int line_num = 8;	// Pin #24, GPIO #8
 	int ret;
-	const int  ToggleValue = 8100000;
+
 	struct timeval t1, t2;
 	double elapsedTime, fTimePerOperation, fFreq;
 
-	int model = GetRPiModel();
-	if (model==Pi5_ModelNo) { //Raspberry Pi 5
-		printf("found model: %d, Raspberry Pi 5\n", model);
-	} else if(model>0) {
-		printf("found model: %d\n", model);
-	} else if(model==0) {
-		printf("unknown model (old style revision code %x)\n", GetRPiRevision());
-	} else {
-		printf("could not detect revision, looks like this is not a Raspberry Pi system\n");
-		return EXIT_FAILURE;
-	}
-
-	printf("gpiolib GPIO speed test program (using line %d)\n", line_num);
-
+	printf("GPIOLIB speed test program (using line %d)\n", line_num);
 
     ret = gpiolib_init();
     if (ret < 0)
@@ -44,6 +33,7 @@ int main(int argc, char **argv) {
         printf("Failed to initialise gpiolib - %d\n", ret);
         return EXIT_FAILURE;
     }
+
     ret = gpiolib_mmap();
     if (ret)
     {
@@ -72,6 +62,9 @@ int main(int argc, char **argv) {
 	fFreq = ToggleValue/elapsedTime/1000000.0;
 	printf("  % 9d toggle took %.3f s, Time per toggle %.3f us, Freq %.3f MHz \n",
 	  ToggleValue, elapsedTime, fTimePerOperation, fFreq);
+
+    gpio_set_drive(line_num, DRIVE_LOW);
+    gpio_set_fsel(line_num, GPIO_FSEL_INPUT);
 
 	return EXIT_SUCCESS;
 }
