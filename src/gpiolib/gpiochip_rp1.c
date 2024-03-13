@@ -355,16 +355,13 @@ static int rp1_gpio_get_level(void *priv, unsigned gpio)
 static void rp1_gpio_set_drive(void *priv, unsigned gpio, GPIO_DRIVE_T drv)
 {
     volatile uint32_t *base = priv;
-    uint32_t reg;
     int bank, offset;
 
     rp1_gpio_get_bank(gpio, &bank, &offset);
-    reg = rp1_gpio_sys_rio_out_read(base, bank, offset);
     if (drv == DRIVE_HIGH)
-        reg |= (1U << offset);
+        rp1_gpio_sys_rio_out_write(base + RP1_SET_OFFSET/4, bank, offset, 1U << offset);
     else if (drv == DRIVE_LOW)
-        reg &= ~(1U << offset);
-    rp1_gpio_sys_rio_out_write(base, bank, offset, reg);
+        rp1_gpio_sys_rio_out_write(base + RP1_CLR_OFFSET/4, bank, offset, 1U << offset);
 }
 
 static void rp1_gpio_set_pull(void *priv, unsigned gpio, GPIO_PULL_T pull)
