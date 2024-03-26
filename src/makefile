@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall 
 
-all: gpio_gpiod gpio_pigpio gpio_wiringpi gpio_wiringpi_sysfs gpio_lgpio gpio_gpiolib
+all: gpio_gpiod gpio_pigpio gpio_wiringpi gpio_wiringpi_sysfs isr_wiringpi gpio_lgpio gpio_gpiolib
 
 gpio_gpiolib:
 	${CC} ${CFLAGS} gpio_gpiolib.c pimodel.c gpiolib/gpiolib.c gpiolib/gpiochip_bcm2712.c gpiolib/gpiochip_bcm2835.c gpiolib/gpiochip_rp1.c gpiolib/util.c -o gpio_gpiolib
@@ -17,6 +17,9 @@ gpio_wiringpi:
 
 gpio_wiringpi_sysfs:
 	${CC} ${CFLAGS} gpio_wiringpi_sysfs.c -o gpio_wiringpi_sysfs -Wall -lwiringPi
+
+isr_wiringpi:
+	${CC} ${CFLAGS} isr_wiringpi.c -o isr_wiringpi -Wall -lwiringPi
 
 gpio_lgpio:
 	${CC} ${CFLAGS} gpio_lgpio.c pimodel.c -o gpio_lgpio -Wall -llgpio
@@ -34,4 +37,4 @@ install:
 	sudo apt install python3-gpiozero python3-rpi.gpio python3-libgpiod python3-lgpio libgpiod2 libgpiod-dev pigpio libpigpio-dev liblgpio1 liblgpio-dev 
 
 clean:
-	rm -f gpio_wiringpi gpio_pigpio gpio_gpiod gpio_wiringpi_sysfs gpio_gpiolib
+	rm -f gpio_lgpio gpio_wiringpi gpio_pigpio gpio_gpiod gpio_wiringpi_sysfs isr_wiringpi gpio_gpiolib
