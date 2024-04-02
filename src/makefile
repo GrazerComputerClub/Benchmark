@@ -1,40 +1,68 @@
 CC = gcc
-CFLAGS = -Wall 
+CFLAGS = -Wall
+OUTDIR = ../bin
 
-all: gpio_gpiod gpio_pigpio gpio_wiringpi gpio_wiringpi_sysfs isr_wiringpi gpio_lgpio gpio_gpiolib
+tests_c = gpio_gpiod gpio_pigpio gpio_wiringpi gpio_wiringpi_sysfs isr_wiringpi gpio_lgpio gpio_gpiolib
 
-gpio_gpiolib:
-	${CC} ${CFLAGS} gpio_gpiolib.c pimodel.c gpiolib/gpiolib.c gpiolib/gpiochip_bcm2712.c gpiolib/gpiochip_bcm2835.c gpiolib/gpiochip_rp1.c gpiolib/util.c -o gpio_gpiolib
+all: $(tests_c)
 
 gpio_gpiod:
-	${CC} ${CFLAGS} gpio_libgpiod.c pimodel.c -o gpio_gpiod -Wall -lgpiod
+	${CC} ${CFLAGS} ./C/gpio_libgpiod.c ./C/pimodel.c -o ${OUTDIR}/gpio_gpiod -Wall -lgpiod
 
 gpio_pigpio:
-	${CC} ${CFLAGS} gpio_pigpio.c -o gpio_pigpio -lpigpio -Wall
+	${CC} ${CFLAGS} ./C/gpio_pigpio.c -o ${OUTDIR}/gpio_pigpio -lpigpio -Wall
 
 gpio_wiringpi:
-	${CC} ${CFLAGS} gpio_wiringpi.c -o gpio_wiringpi -Wall -lwiringPi
+	${CC} ${CFLAGS} ./C/gpio_wiringpi.c -o ${OUTDIR}/gpio_wiringpi -Wall -lwiringPi
 
 gpio_wiringpi_sysfs:
-	${CC} ${CFLAGS} gpio_wiringpi_sysfs.c -o gpio_wiringpi_sysfs -Wall -lwiringPi
+	${CC} ${CFLAGS} ./C/gpio_wiringpi_sysfs.c -o ${OUTDIR}/gpio_wiringpi_sysfs -Wall -lwiringPi
 
 isr_wiringpi:
-	${CC} ${CFLAGS} isr_wiringpi.c -o isr_wiringpi -Wall -lwiringPi
+	${CC} ${CFLAGS} ./C/isr_wiringpi.c -o ${OUTDIR}/isr_wiringpi -Wall -lwiringPi
 
 gpio_lgpio:
-	${CC} ${CFLAGS} gpio_lgpio.c pimodel.c -o gpio_lgpio -Wall -llgpio
+	${CC} ${CFLAGS} ./C/gpio_lgpio.c ./C/pimodel.c -o ${OUTDIR}/gpio_lgpio -Wall -llgpio
 
+gpio_gpiolib:
+	${CC} ${CFLAGS} ./C/gpio_gpiolib.c ./C/pimodel.c gpiolib/gpiolib.c gpiolib/gpiochip_bcm2712.c gpiolib/gpiochip_bcm2835.c gpiolib/gpiochip_rp1.c gpiolib/util.c -o ${OUTDIR}/gpio_gpiolib
+
+.ONESHELL:
 bench:
-	./gpio_gpiod && echo  && ./gpio_lgpio && echo  && sudo ./gpio_pigpio && echo  && ./gpio_wiringpi && echo  && ./gpio_wiringpi_sysfs && echo  && ./gpio_gpiolib
+	./${OUTDIR}/gpio_gpiod 
+	echo
+	./${OUTDIR}/gpio_lgpio
+	echo
+	sudo ./${OUTDIR}/gpio_pigpio
+	echo 
+	./${OUTDIR}/gpio_wiringpi
+	echo
+	./${OUTDIR}/gpio_gpiolib
 
+.ONESHELL:
 pybench:
-	./gpio_gpiozero.py && echo  && ./gpio_libgpiod.py && echo  && ./gpio_libgpiod2.py && echo  && ./gpio_RPi.GPIO.py 
+	./python/gpio_gpiozero.py
+	echo
+	./python/gpio_libgpiod.py
+	echo
+	./python/gpio_libgpiod2.py
+	echo
+	./python/gpio_RPi.GPIO.py 
 
+.ONESHELL:
 pi5bench:
-	./gpio_gpiozero.py && echo  && ./gpio_libgpiod.py && echo  && ./gpio_gpiod && echo  && ./gpio_lgpio && ./gpio_wiringpi_sysfs && echo  && ./gpio_gpiolib
+	./python/gpio_gpiozero.py
+	echo
+	./python/gpio_libgpiod.py
+	echo
+	./${OUTDIR}/gpio_gpiod
+	echo
+	./${OUTDIR}/gpio_lgpio
+	echo
+	./${OUTDIR}/gpio_gpiolib
 
 install:
 	sudo apt install python3-gpiozero python3-rpi.gpio python3-libgpiod python3-lgpio libgpiod2 libgpiod-dev pigpio libpigpio-dev liblgpio1 liblgpio-dev 
 
 clean:
-	rm -f gpio_lgpio gpio_wiringpi gpio_pigpio gpio_gpiod gpio_wiringpi_sysfs isr_wiringpi gpio_gpiolib
+	rm -f ${OUTDIR}/*
