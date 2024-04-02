@@ -79,6 +79,7 @@ install:
 
 install-perf:
 	sudo apt install google-perftools libgoogle-perftools-dev -y
+install-perf: install
 
 clean:
 	rm -f ${OUTDIR}/*
