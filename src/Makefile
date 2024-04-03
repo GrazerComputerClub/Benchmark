@@ -65,13 +65,13 @@ bench-gperf:
 bench-perf:  
 	for t in $(tests_c) ; do \
 		echo === profiling: perf via flamegraph-rs $${t} === ; \
-		flamegraph -o ./${RESULTSDIR}/$${t}.flamegraph.svg -- ./${OUTDIR}/$${t} ; \
+		flamegraph -o ./${RESULTSDIR}/$${t}.flamegraph.svg -F 100000 -- ./${OUTDIR}/$${t} ; \
 		echo ; \
 	done
 
 ONESHELL:
 bench-wiringpi:
-	flamegraph -o ./${RESULTSDIR}/gpio_wiringpi.flamegraph.svg -- ./${OUTDIR}/gpio_wiringpi
+	flamegraph -o ./${RESULTSDIR}/gpio_wiringpi.flamegraph.svg -F 100000 -- ./${OUTDIR}/gpio_wiringpi
 
 ONESHELL:
 pybench:
@@ -98,6 +98,7 @@ pi5bench:
 install:
 	sudo apt install python3-gpiozero python3-rpi.gpio python3-libgpiod python3-lgpio libgpiod2 libgpiod-dev pigpio libpigpio-dev liblgpio1 liblgpio-dev -y
 
+# echo -1 | sudo tee /proc/sys/kernel/perf_event_paranoid
 install-perf:
 	sudo apt install cargo python3-bpfcc linux-perf google-perftools libgoogle-perftools-dev -y ; \
 	cargo install flamegraph ; \
