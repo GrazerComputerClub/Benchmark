@@ -64,18 +64,14 @@ bench-gperf:
 
 bench-perf:  
 	for t in $(tests_c) ; do \
-		echo === profiling: perf $${t} === ; \
-		sudo perf record a -F max --overwrite -o ./${OUTDIR}/$${t}.perf -- ./${OUTDIR}/$${t} ; \
-		sudo chmod o+rw ./${OUTDIR}/$${t}.perf ; \
-		perf script -i ./${OUTDIR}/$${t}.perf | ../submodules/FlameGraph/stackcollapse-perf.pl > ./${OUTDIR}/$${t}.perf-folded ; \
-		../submodules/FlameGraph/flamegraph.pl ./${OUTDIR}/$${t}.perf-folded > ./${RESULTSDIR}/$${t}.flamegraph.svg ; \
+		echo === profiling: perf via flamegraph-rs $${t} === ; \
+		flamegraph -o ./${RESULTSDIR}/$${t}.flamegraph.svg -- ./${OUTDIR}/$${t} ; \
 		echo ; \
 	done
 
 ONESHELL:
 bench-wiringpi:
-	# sudo perf record -a -F max -v --overwrite -o ./${OUTDIR}/gpio_wiringpi.perf ./${OUTDIR}/gpio_wiringpi
-	sudo perf script flamegraph -a -F max ./${OUTDIR}/gpio_wiringpi
+	flamegraph -o ./${RESULTSDIR}/gpio_wiringpi.flamegraph.svg -- ./${OUTDIR}/gpio_wiringpi
 
 ONESHELL:
 pybench:
@@ -103,7 +99,8 @@ install:
 	sudo apt install python3-gpiozero python3-rpi.gpio python3-libgpiod python3-lgpio libgpiod2 libgpiod-dev pigpio libpigpio-dev liblgpio1 liblgpio-dev -y
 
 install-perf:
-	sudo apt install python3-bpfcc linux-perf google-perftools libgoogle-perftools-dev -y ; \
+	sudo apt install cargo python3-bpfcc linux-perf google-perftools libgoogle-perftools-dev -y ; \
+	cargo install flamegraph ; \
 	DTEMPLATE=/usr/share/d3-flame-graph/d3-flamegraph-base.html ; \
 	if [ -f "$${DTEMPLATE}" ]; then \
     echo "d3-flamegraph-base template exists." ; \
