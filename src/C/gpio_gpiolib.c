@@ -14,7 +14,7 @@
 #include <sys/time.h>
 
 #include "pimodel.h"
-#include "gpiolib/gpiolib.h"
+#include "../gpiolib/gpiolib.h"
 
 unsigned int line_num = 24;	// GPIO #24
 const int  ToggleValue = 240000000;
