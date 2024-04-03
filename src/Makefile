@@ -1,14 +1,25 @@
 CC = gcc
 CFLAGS = -Wall
 OUTDIR = ../bin
+RESULTSDIR = ../results
 LDFLAGS = 
 
 tests_c = gpio_gpiod gpio_pigpio gpio_wiringpi isr_wiringpi gpio_lgpio gpio_gpiolib
 
 all: $(tests_c)
 
-all-perf: LDFLAGS=-Bstatic -Wl,--no-as-needed,-lprofiler,--as-needed
+all-gperf: LDFLAGS=-Bstatic -Wl,--no-as-needed,-lprofiler,--as-needed
+all-gperf: all
+
+all-perf: LDFLAGS=
+all-perf: CFLAGS=-g3 -fno-inline -O0 -Wall
 all-perf: all
+
+bench-flamegraphs: all-gperf
+bench-flamegraphs: bench-gperf
+bench-flamegraphs: clean-bin
+bench-flamegraphs: all-perf
+bench-flamegraphs: bench-perf
 
 gpio_gpiod:
 	${CC} ${CFLAGS} ./C/gpio_libgpiod.c ./C/pimodel.c -o ${OUTDIR}/gpio_gpiod $(LDFLAGS) -lgpiod
@@ -43,14 +54,28 @@ bench:
 	echo
 	./${OUTDIR}/gpio_gpiolib
 
-bench-perf:  
+bench-gperf:  
 	for t in $(tests_c) ; do \
-		echo === profiling: $${t} === ; \
-		CPUPROFILE=./${OUTDIR}/$${t}.prof ./${OUTDIR}/$${t} ; \
-		echo === preliminary report: $${t} === ; \
-		google-pprof ./${OUTDIR}/$${t} ./${OUTDIR}/$${t}.prof --text ; \
+		echo === profiling: gperf $${t} === ; \
+		CPUPROFILE=./${OUTDIR}/$${t}.prof CPUPROFILE_FREQUENCY=10000 ./${OUTDIR}/$${t} ; \
+		google-pprof ./${OUTDIR}/$${t} ./${OUTDIR}/$${t}.prof --collapsed | ../submodules/FlameGraph/flamegraph.pl > ./${RESULTSDIR}/$${t}.flamegraph_g.svg ; \
 		echo ; \
 	done
+
+bench-perf:  
+	for t in $(tests_c) ; do \
+		echo === profiling: perf $${t} === ; \
+		sudo perf record a -F max --overwrite -o ./${OUTDIR}/$${t}.perf -- ./${OUTDIR}/$${t} ; \
+		sudo chmod o+rw ./${OUTDIR}/$${t}.perf ; \
+		perf script -i ./${OUTDIR}/$${t}.perf | ../submodules/FlameGraph/stackcollapse-perf.pl > ./${OUTDIR}/$${t}.perf-folded ; \
+		../submodules/FlameGraph/flamegraph.pl ./${OUTDIR}/$${t}.perf-folded > ./${RESULTSDIR}/$${t}.flamegraph.svg ; \
+		echo ; \
+	done
+
+ONESHELL:
+bench-wiringpi:
+	# sudo perf record -a -F max -v --overwrite -o ./${OUTDIR}/gpio_wiringpi.perf ./${OUTDIR}/gpio_wiringpi
+	sudo perf script flamegraph -a -F max ./${OUTDIR}/gpio_wiringpi
 
 ONESHELL:
 pybench:
@@ -78,8 +103,22 @@ install:
 	sudo apt install python3-gpiozero python3-rpi.gpio python3-libgpiod python3-lgpio libgpiod2 libgpiod-dev pigpio libpigpio-dev liblgpio1 liblgpio-dev -y
 
 install-perf:
-	sudo apt install google-perftools libgoogle-perftools-dev -y
+	sudo apt install python3-bpfcc linux-perf google-perftools libgoogle-perftools-dev -y ; \
+	DTEMPLATE=/usr/share/d3-flame-graph/d3-flamegraph-base.html ; \
+	if [ -f "$${DTEMPLATE}" ]; then \
+    echo "d3-flamegraph-base template exists." ; \
+	else \
+		sudo mkdir /usr/share/d3-flame-graph/ ; \
+		sudo wget https://cdn.jsdelivr.net/npm/d3-flame-graph@4.1.3/dist/templates/d3-flamegraph-base.html -O $${DTEMPLATE} ; \
+	fi
 install-perf: install
 
-clean:
+# flamegraphs:
+# https://www.brendangregg.com/flamegraphs.html
+
+clean-bin:
 	rm -f ${OUTDIR}/*
+
+clean: 
+	rm -f ${RESULTSDIR}/*
+clean: clean-bin
