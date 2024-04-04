@@ -4,7 +4,7 @@ OUTDIR = ../bin
 RESULTSDIR = ../results
 LDFLAGS = 
 
-tests_c = gpio_gpiod gpio_pigpio gpio_wiringpi isr_wiringpi gpio_lgpio gpio_gpiolib
+tests_c = gpio_gpiod gpio_pigpio gpio_wiringpi isr_wiringpi isr_wiringpi_pullmode gpio_lgpio gpio_gpiolib
 
 all: $(tests_c)
 
@@ -36,6 +36,9 @@ gpio_wiringpi_sysfs:
 isr_wiringpi:
 	${CC} ${CFLAGS} ./C/isr_wiringpi.c -o ${OUTDIR}/isr_wiringpi $(LDFLAGS) -lwiringPi
 
+isr_wiringpi_pullmode:
+	${CC} ${CFLAGS} ./C/isr_wiringpi_pullmode.c -o ${OUTDIR}/isr_wiringpi_pullmode $(LDFLAGS) -lwiringPi
+
 gpio_lgpio:
 	${CC} ${CFLAGS} ./C/gpio_lgpio.c ./C/pimodel.c -o ${OUTDIR}/gpio_lgpio $(LDFLAGS) -llgpio 
 
@@ -51,6 +54,8 @@ bench:
 	sudo ./${OUTDIR}/gpio_pigpio
 	echo 
 	./${OUTDIR}/gpio_wiringpi
+	echo
+	./${OUTDIR}/gpio_wiringpi_pullmode
 	echo
 	./${OUTDIR}/gpio_gpiolib
 
