@@ -9,17 +9,14 @@ tests_c = gpio_gpiod gpio_pigpio gpio_wiringpi isr_wiringpi isr_wiringpi_pullmod
 all: $(tests_c)
 
 all-gperf: LDFLAGS=-Bstatic -Wl,--no-as-needed,-lprofiler,--as-needed
+all-gperf: CFLAGS=-g3 -fno-inline -Wall
 all-gperf: all
 
 all-perf: LDFLAGS=
-all-perf: CFLAGS=-g3 -fno-inline -O0 -Wall
+all-perf: CFLAGS=-g3 -fno-inline -Wall
 all-perf: all
 
-bench-flamegraphs: all-gperf
-bench-flamegraphs: bench-gperf
-bench-flamegraphs: clean-bin
-bench-flamegraphs: all-perf
-bench-flamegraphs: bench-perf
+bench-flamegraphs: bench-gperf bench-perf
 
 gpio_gpiod:
 	${CC} ${CFLAGS} ./C/gpio_libgpiod.c ./C/pimodel.c -o ${OUTDIR}/gpio_gpiod $(LDFLAGS) -lgpiod
@@ -59,6 +56,7 @@ bench:
 	echo
 	./${OUTDIR}/gpio_gpiolib
 
+bench-gperf: clean-bin all-gperf
 bench-gperf:  
 	for t in $(tests_c) ; do \
 		echo === profiling: gperf $${t} === ; \
@@ -67,16 +65,33 @@ bench-gperf:
 		echo ; \
 	done
 
-bench-perf:  
+bench-flamegraph-rs: clean-bin all
+bench-flamegraph-rs:  
 	for t in $(tests_c) ; do \
 		echo === profiling: perf via flamegraph-rs $${t} === ; \
 		flamegraph -o ./${RESULTSDIR}/$${t}.flamegraph.svg -F 100000 -- ./${OUTDIR}/$${t} ; \
 		echo ; \
 	done
 
+bench-perf: clean-bin all-perf
+bench-perf:
+	for t in $(tests_c) ; do \
+		rm ./${RESULTSDIR}/$${t}.perf || true; \
+		rm ./${RESULTSDIR}/$${t}.txt || true ; \
+		rm ./${RESULTSDIR}/$${t}.svg ||true ; \
+		echo === profiling: perf via perf $${t} === ; \
+		perf record -m 16M -z --aio -F max -o ./${RESULTSDIR}/$${t}.perf -- ./${OUTDIR}/$${t} ; \
+		flamegraph -o ./${RESULTSDIR}/$${t}.svg --perfdata ./${RESULTSDIR}/$${t}.perf -- ./${OUTDIR}/$${t} ; \
+		echo ; \
+	done
+
 ONESHELL:
+bench-wiringpi: clean-bin all-perf
 bench-wiringpi:
-	flamegraph -o ./${RESULTSDIR}/gpio_wiringpi.flamegraph.svg -F 100000 -- ./${OUTDIR}/gpio_wiringpi
+	perf record -m 16M -z --aio -F max -o ./${RESULTSDIR}/gpio_wiringpi.perf -- ./${OUTDIR}/gpio_wiringpi ; \
+ 	flamegraph -o ./${RESULTSDIR}/gpio_wiringpi.flamegraph.svg --perfdata ./${RESULTSDIR}/gpio_wiringpi.perf
+
+# flamegraph -o ./${RESULTSDIR}/gpio_wiringpi.flamegraph.svg -F 100000 -- ./${OUTDIR}/gpio_wiringpi
 
 ONESHELL:
 pybench:
