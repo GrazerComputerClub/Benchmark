@@ -1,14 +1,22 @@
 CC = gcc
 CFLAGS = -Wall
 OUTDIR = ../bin
+RESULTSDIR = ../results
 LDFLAGS = 
 
-tests_c = gpio_gpiod gpio_pigpio gpio_wiringpi isr_wiringpi gpio_lgpio gpio_gpiolib
+tests_c = gpio_gpiod gpio_pigpio gpio_wiringpi isr_wiringpi isr_wiringpi_pullmode gpio_lgpio gpio_gpiolib
 
 all: $(tests_c)
 
-all-perf: LDFLAGS=-Bstatic -Wl,--no-as-needed,-lprofiler,--as-needed
+all-gperf: LDFLAGS=-Bstatic -Wl,--no-as-needed,-lprofiler,--as-needed
+all-gperf: CFLAGS=-g3 -fno-inline -Wall
+all-gperf: all
+
+all-perf: LDFLAGS=
+all-perf: CFLAGS=-g3 -fno-inline -Wall
 all-perf: all
+
+bench-flamegraphs: bench-gperf bench-perf
 
 gpio_gpiod:
 	${CC} ${CFLAGS} ./C/gpio_libgpiod.c ./C/pimodel.c -o ${OUTDIR}/gpio_gpiod $(LDFLAGS) -lgpiod
@@ -24,6 +32,9 @@ gpio_wiringpi_sysfs:
 
 isr_wiringpi:
 	${CC} ${CFLAGS} ./C/isr_wiringpi.c -o ${OUTDIR}/isr_wiringpi $(LDFLAGS) -lwiringPi
+
+isr_wiringpi_pullmode:
+	${CC} ${CFLAGS} ./C/isr_wiringpi_pullmode.c -o ${OUTDIR}/isr_wiringpi_pullmode $(LDFLAGS) -lwiringPi
 
 gpio_lgpio:
 	${CC} ${CFLAGS} ./C/gpio_lgpio.c ./C/pimodel.c -o ${OUTDIR}/gpio_lgpio $(LDFLAGS) -llgpio 
@@ -41,16 +52,46 @@ bench:
 	echo 
 	./${OUTDIR}/gpio_wiringpi
 	echo
+	./${OUTDIR}/gpio_wiringpi_pullmode
+	echo
 	./${OUTDIR}/gpio_gpiolib
 
-bench-perf:  
+bench-gperf: clean-bin all-gperf
+bench-gperf:  
 	for t in $(tests_c) ; do \
-		echo === profiling: $${t} === ; \
-		CPUPROFILE=./${OUTDIR}/$${t}.prof ./${OUTDIR}/$${t} ; \
-		echo === preliminary report: $${t} === ; \
-		google-pprof ./${OUTDIR}/$${t} ./${OUTDIR}/$${t}.prof --text ; \
+		echo === profiling: gperf $${t} === ; \
+		CPUPROFILE=./${OUTDIR}/$${t}.prof CPUPROFILE_FREQUENCY=10000 ./${OUTDIR}/$${t} ; \
+		google-pprof ./${OUTDIR}/$${t} ./${OUTDIR}/$${t}.prof --collapsed | ../submodules/FlameGraph/flamegraph.pl > ./${RESULTSDIR}/$${t}.flamegraph_g.svg ; \
 		echo ; \
 	done
+
+bench-flamegraph-rs: clean-bin all
+bench-flamegraph-rs:  
+	for t in $(tests_c) ; do \
+		echo === profiling: perf via flamegraph-rs $${t} === ; \
+		flamegraph -o ./${RESULTSDIR}/$${t}.flamegraph.svg -F 100000 -- ./${OUTDIR}/$${t} ; \
+		echo ; \
+	done
+
+bench-perf: clean-bin all-perf
+bench-perf:
+	for t in $(tests_c) ; do \
+		rm ./${RESULTSDIR}/$${t}.perf || true; \
+		rm ./${RESULTSDIR}/$${t}.txt || true ; \
+		rm ./${RESULTSDIR}/$${t}.svg ||true ; \
+		echo === profiling: perf via perf $${t} === ; \
+		perf record -m 16M -z --aio -F max -o ./${RESULTSDIR}/$${t}.perf -- ./${OUTDIR}/$${t} ; \
+		flamegraph -o ./${RESULTSDIR}/$${t}.svg --perfdata ./${RESULTSDIR}/$${t}.perf -- ./${OUTDIR}/$${t} ; \
+		echo ; \
+	done
+
+ONESHELL:
+bench-wiringpi: clean-bin all-perf
+bench-wiringpi:
+	perf record -m 16M -z --aio -F max -o ./${RESULTSDIR}/gpio_wiringpi.perf -- ./${OUTDIR}/gpio_wiringpi ; \
+ 	flamegraph -o ./${RESULTSDIR}/gpio_wiringpi.flamegraph.svg --perfdata ./${RESULTSDIR}/gpio_wiringpi.perf
+
+# flamegraph -o ./${RESULTSDIR}/gpio_wiringpi.flamegraph.svg -F 100000 -- ./${OUTDIR}/gpio_wiringpi
 
 ONESHELL:
 pybench:
@@ -77,9 +118,25 @@ pi5bench:
 install:
 	sudo apt install python3-gpiozero python3-rpi.gpio python3-libgpiod python3-lgpio libgpiod2 libgpiod-dev pigpio libpigpio-dev liblgpio1 liblgpio-dev -y
 
+# echo -1 | sudo tee /proc/sys/kernel/perf_event_paranoid
 install-perf:
-	sudo apt install google-perftools libgoogle-perftools-dev -y
+	sudo apt install cargo python3-bpfcc linux-perf google-perftools libgoogle-perftools-dev -y ; \
+	cargo install flamegraph ; \
+	DTEMPLATE=/usr/share/d3-flame-graph/d3-flamegraph-base.html ; \
+	if [ -f "$${DTEMPLATE}" ]; then \
+    echo "d3-flamegraph-base template exists." ; \
+	else \
+		sudo mkdir /usr/share/d3-flame-graph/ ; \
+		sudo wget https://cdn.jsdelivr.net/npm/d3-flame-graph@4.1.3/dist/templates/d3-flamegraph-base.html -O $${DTEMPLATE} ; \
+	fi
 install-perf: install
 
-clean:
+# flamegraphs:
+# https://www.brendangregg.com/flamegraphs.html
+
+clean-bin:
 	rm -f ${OUTDIR}/*
+
+clean: 
+	rm -f ${RESULTSDIR}/*
+clean: clean-bin
